@@ -44,7 +44,7 @@ bool PidProcessor::registerMode01Pid(uint32_t pid) {
         setPidBit(pid);
 
         char buffer[4];
-        sprintf(buffer, "%02X", pid);
+        sprintf(buffer, "%02X", (unsigned int) pid);
         DEBUG("Registered PID: " + String(buffer ));
         return true;
     }
@@ -148,9 +148,3 @@ void PidProcessor::resetPidMode01Array() {
         pidMode01Supported[i] = 0x0;
     }
 }
-
-
-
-
-
-
