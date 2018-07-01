@@ -28,7 +28,7 @@ String GTTurboEcu::readPidRequest() {
 
 
 bool GTTurboEcu::registerMode01Pid(uint32_t pid) {
-    _pidProcessor->registerMode01Pid(pid);
+    return _pidProcessor->registerMode01Pid(pid);
 }
 
 
