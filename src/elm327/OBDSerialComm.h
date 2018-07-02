@@ -41,6 +41,8 @@ public:
 
     void writeTo(char const *string);
 
+    void writeTo(String string);
+
     void setEcho(bool echo);
 
     void writeEnd();

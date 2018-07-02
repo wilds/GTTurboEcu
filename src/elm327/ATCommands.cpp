@@ -68,7 +68,7 @@ void ATCommands::processCommand(String command) {
 // set all to defaults
 void ATCommands::ATD() {
     connection->setToDefaults();
-    connection->writeTo("BUS INIT: ...");
+    connection->writeTo(F("BUS INIT: ..."));
     connection->writeEndOK();
 
 }
@@ -151,4 +151,3 @@ bool ATCommands::isATCommand(String command) {
     toUpperCase(command.charAt(0));
     return command.startsWith("AT") ? true : false;
 }
-

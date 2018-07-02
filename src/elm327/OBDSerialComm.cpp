@@ -18,13 +18,13 @@ void OBDSerialComm::writeEnd() {
 
     // 1 - write carriage return
     //    writeTo(0x0D);
-    writeTo("\n");
+    writeTo('\n');
     //    writeTo(13);
 
 
     // 2- (optional ) write linefeed
     if (lineFeedEnable) {
-        writeTo("\r");
+        writeTo('\r');
         // writeTo(10);
     }
 
@@ -37,22 +37,22 @@ void OBDSerialComm::writeEnd() {
 
 
 void OBDSerialComm::writeEndOK() {
-    writeTo("OK");
+    writeTo(F("OK"));
     writeEnd();
 }
 
 void OBDSerialComm::writeEndERROR() {
-    writeTo("ERROR");
+    writeTo(F("ERROR"));
     writeEnd();
 }
 
 void OBDSerialComm::writeEndNoData() {
-    writeTo("NO DATA");
+    writeTo(F("NO DATA"));
     writeEnd();
 }
 
 void OBDSerialComm::writeEndUnknown() {
-    writeTo("?");
+    writeTo(F("?"));
     writeEnd();
 }
 
@@ -65,13 +65,19 @@ void OBDSerialComm::setToDefaults() {
     setMemory(false);
 }
 
+void OBDSerialComm::writeTo(uint8_t cChar) {
+    serial->write(cChar);
+}
+
 void OBDSerialComm::writeTo(char const *response) {
     serial->write(response);
 }
 
-
-void OBDSerialComm::writeTo(uint8_t cChar) {
-    serial->write(cChar);
+void OBDSerialComm::writeTo(String response) {
+    for (uint8_t i = 0; i < response.length(); i++) {
+        // Push each char 1 by 1 on each loop pass
+        Serial.write(response[i]);
+    }
 }
 
 void OBDSerialComm::writeEndPidTo(char const *response) {
