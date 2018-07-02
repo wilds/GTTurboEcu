@@ -76,7 +76,7 @@ void OBDSerialComm::writeTo(char const *response) {
 void OBDSerialComm::writeTo(String response) {
     for (uint8_t i = 0; i < response.length(); i++) {
         // Push each char 1 by 1 on each loop pass
-        Serial.write(response[i]);
+        serial->write(response[i]);
     }
 }
 
