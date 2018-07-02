@@ -78,20 +78,20 @@ void ATCommands::ATD() {
 void ATCommands::ATZ() {
     connection->setEcho(true);
     connection->setStatus(connection->IDLE);
-    connection->writeTo(ID);
+    connection->writeTo(ELM_ID);
     connection->writeEndOK();
 }
 
 // Print the version ID
 void ATCommands::ATI() {
     connection->setStatus(connection->READY);
-    connection->writeTo(ID);
+    connection->writeTo(ELM_ID);
     connection->writeEndOK();
 }
 
 // send description
 void ATCommands::ATDESC() {
-    connection->writeTo(DESC);
+    connection->writeTo(ELM_DESC);
     connection->writeEndOK();
 }
 
@@ -132,7 +132,7 @@ void ATCommands::ATSPx(String cmd) {
 
 // set protocol
 void ATCommands::ATDPN() {
-    connection->writeTo(PROTOCOL);
+    connection->writeTo(ELM_PROTOCOL);
     connection->writeEndOK();
 }
 

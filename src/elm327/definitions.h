@@ -23,9 +23,15 @@ extern HardwareSerial Serial;
 
 
 // Device ID
-#define ID  "ELM327 - GTTurboECU V0.0.1"
-#define DESC  "GTTurbo OBD2 Arduino libs, based on ELM"
-#define PROTOCOL "6" // canbus 500k 11 bit protocol id for elm.
+#ifndef ELM_ID
+#define ELM_ID "ELM327 - GTTurboECU V0.0.1"
+#endif
+#ifndef ELM_DESC
+#define ELM_DESC "GTTurbo OBD2 Arduino libs, based on ELM"
+#endif
+#ifndef ELM_PROTOCOL
+#define ELM_PROTOCOL "6" // canbus 500k 11 bit protocol id for elm.
+#endif
 
 // Char representing end of serial string
 #define SERIAL_END_CHAR  0x0D
