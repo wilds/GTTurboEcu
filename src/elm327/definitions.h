@@ -11,8 +11,9 @@
 extern HardwareSerial Serial;
 
 
-#define DO_DEBUG true
+#define DO_DEBUG false
 #define DEBUG(x) do {if (DO_DEBUG) { Serial.println(x); } } while (0)
+#define DEBUGW(x) do {if (DO_DEBUG) { Serial.print(x); } } while (0)
 
 
 #define xtoc(x) ((x < 10) ? ('0' + x) : ('A' - 10 + x))
@@ -24,13 +25,16 @@ extern HardwareSerial Serial;
 
 // Device ID
 #ifndef ELM_ID
-#define ELM_ID "ELM327 - GTTurboECU V0.0.1"
+#define ELM_ID "ELM327 v1.4"
 #endif
 #ifndef ELM_DESC
 #define ELM_DESC "GTTurbo OBD2 Arduino libs, based on ELM"
 #endif
 #ifndef ELM_PROTOCOL
-#define ELM_PROTOCOL "6" // canbus 500k 11 bit protocol id for elm.
+#define ELM_PROTOCOL "0" // ISO 14230-4 KWP (fast init, 10.4 kbaud)
+#endif
+#ifndef ELM_PROTOCOL_DESC
+#define ELM_PROTOCOL_DESC "ISO 14230-4 KWP (fast init, 10.4 kbaud)"
 #endif
 
 // Char representing end of serial string

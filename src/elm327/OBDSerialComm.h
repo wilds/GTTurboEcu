@@ -39,6 +39,8 @@ public:
 
     void writeTo(uint8_t cChar);
 
+    void writeTo(char cChar);
+
     void writeTo(char const *string);
 
     void writeTo(String string);
@@ -59,7 +61,7 @@ public:
 
     void setStatus(STATUS status);
 
-    void writeEndPidTo(char const *string);
+    void writeEndPidTo(uint8_t const *string, uint8_t len);
 
 private:
 
@@ -76,11 +78,17 @@ private:
     bool whiteSpacesEnabled;
     bool headersEnabled;
 
+    const uint8_t ECUaddr = 0x11;
+    const uint8_t MyAddr = 0xF1;
+
     void setBaudRate(uint32_t rate);
 
     long getBaudRate();
 
     void addSpacesToResponse(const char *response, char string[]);
+
+    char * OBDSerialComm::toHexString(uint8_t *buffer, uint8_t len);
+    uint8_t calcChecksum(uint8_t *data, uint8_t len);
 };
 
 

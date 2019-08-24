@@ -43,6 +43,8 @@ private:
 
     void ATDPN();
 
+	void ATDP();
+
     void ATDESC();
 
     void processCommand(String command);

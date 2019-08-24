@@ -21,16 +21,39 @@ bool PidProcessor::process(String command) {
     if (isSupportedPidRequest(pid)) {
         processed = true;
         uint32_t supportedPids = getSupportedPids(pid);
-        writePidResponse(command, 4, supportedPids);
+        writePidResponse(hexCommand, 4, supportedPids);
     }
     return processed;
 }
 
-void PidProcessor::writePidResponse(String requestPid, uint8_t numberOfBytes, uint32_t value) {
-    uint8_t  nHexChars = PID_N_BYTES * N_CHARS_IN_BYTE +  numberOfBytes * N_CHARS_IN_BYTE ;
-    char responseArray[nHexChars + 1]; // one more for termination char
-    getFormattedResponse(responseArray, nHexChars, requestPid, value);
-    _connection->writeEndPidTo(responseArray);
+
+void PidProcessor::writePidResponse(uint16_t requestPid, uint8_t numberOfBytes, const char * value) {
+    uint8_t len = sizeof(requestPid) + numberOfBytes;
+    uint8_t response[len];
+
+    response[0] = (requestPid >> 8) + 0x40;
+    response[1] = requestPid & 0xFF;
+
+    memcpy(response + sizeof(requestPid), &value, sizeof(value));
+
+    _connection->writeEndPidTo(response, len);
+}
+
+
+void PidProcessor::writePidResponse(uint16_t requestPid, uint8_t numberOfBytes, uint32_t value) {
+    uint8_t len = sizeof(requestPid) + numberOfBytes;
+    uint8_t response[len];
+
+    response[0] = (requestPid >> 8) + 0x40;
+    response[1] = requestPid & 0xFF;
+    
+    for (uint8_t i = 0; i < numberOfBytes; ++i)
+        response[2 + i] = (value >> (8 * (numberOfBytes-1-i))) & 0xFF;
+
+    //memcpy(response, &requestPid, sizeof(requestPid));
+    //memcpy(response + sizeof(requestPid), &value, sizeof(value));
+
+    _connection->writeEndPidTo(response, len);
 }
 
 /**
@@ -124,6 +147,7 @@ uint32_t PidProcessor:: getSupportedPids(uint8_t pid) {
     return pidMode01Supported[index];
 }
 
+/*
 void PidProcessor::getFormattedResponse(char *response, uint8_t totalNumberOfChars, String pid, uint32_t value) {
     uint8_t nValueChars = totalNumberOfChars - PID_N_BYTES * N_CHARS_IN_BYTE;
     char cValue[2];
@@ -142,7 +166,7 @@ String PidProcessor::convertToPidResponse(String pid) {
     x.concat(pid.substring(1, pid.length()));
     return x;
 }
-
+*/
 void PidProcessor::resetPidMode01Array() {
     for(uint8_t i = 0; i < N_MODE01_INTERVALS; i++ ) {
         pidMode01Supported[i] = 0x0;

@@ -13,7 +13,7 @@ GTTurboEcu::~GTTurboEcu() {
 }
 
 
-String GTTurboEcu::readPidRequest() {
+String GTTurboEcu::readPidRequestString() {
     String rxData;
     do {
         rxData = _connection->readData();
@@ -25,7 +25,10 @@ String GTTurboEcu::readPidRequest() {
     return rxData;
 }
 
-
+uint16_t GTTurboEcu::readPidRequest() {
+    String rxData = readPidRequestString();
+    return strtoul(rxData.c_str(), NULL, HEX);
+}
 
 bool GTTurboEcu::registerMode01Pid(uint32_t pid) {
     return _pidProcessor->registerMode01Pid(pid);
@@ -37,7 +40,7 @@ void GTTurboEcu::writePidNotSupported() {
 }
 
 
-void GTTurboEcu::writePidResponse(String requestPid, uint8_t numberOfBytes, uint32_t value) {
+void GTTurboEcu::writePidResponse(uint16_t requestPid, uint8_t numberOfBytes, uint32_t value) {
     _pidProcessor->writePidResponse(requestPid, numberOfBytes, value);
 }
 

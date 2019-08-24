@@ -30,7 +30,15 @@ void ATCommands::processCommand(String command) {
 
     // refer to ELM327 specs
     String specificCommand = command.substring(offset, command.length());
-    if (specificCommand.startsWith("D",offset)) {
+	if (specificCommand.startsWith("D0") || specificCommand.startsWith("D1")) {
+        connection->writeEndOK();
+    } else if (specificCommand.startsWith("DPN")) {
+        ATCommands::ATDPN();
+    } else if (specificCommand.startsWith("DP")) {
+        ATCommands::ATDP();
+    } else if (specificCommand.startsWith("DESC") || specificCommand.startsWith("@1")) {
+        ATCommands::ATDESC();
+    } else if (specificCommand.startsWith("D")) {
         ATCommands::ATD();
     } else if (specificCommand.startsWith("Z")) {
         ATCommands::ATZ();
@@ -45,6 +53,9 @@ void ATCommands::processCommand(String command) {
     } else if (specificCommand.startsWith("S")) {
         if (specificCommand.startsWith("SP")) {
             ATCommands::ATSPx(specificCommand);
+        } else if (specificCommand.startsWith("ST")) {
+			//ATCommands::ATSTx(specificCommand);	//TODO connection->setTimeout(par * 4);
+            connection->writeEndOK();
         } else {
             ATCommands::ATSx(specificCommand);
         }
@@ -52,14 +63,12 @@ void ATCommands::processCommand(String command) {
         ATCommands::ATHx(specificCommand);
     } else if (specificCommand.startsWith("AT")) {
         ATCommands::ATATx(specificCommand);
-    } else if (specificCommand.startsWith("DPN")) {
-        ATCommands::ATDPN();
-    }  else if (specificCommand.startsWith("DESC") || specificCommand.startsWith("@1")) {
-        ATCommands::ATDESC();
+	} else if (specificCommand.startsWith("@2")) {
+		connection->writeTo(F("ELM327"));
     } else if (specificCommand.startsWith("PC")) {
         ATCommands::ATPC();
     } else {
-
+DEBUG("Unrecognized command " + command);
         // lets assume we process any at command
         connection->writeEndOK();
     }
@@ -70,9 +79,7 @@ void ATCommands::ATD() {
     connection->setToDefaults();
     connection->writeTo(F("BUS INIT: ..."));
     connection->writeEndOK();
-
 }
-
 
 // reset all
 void ATCommands::ATZ() {
@@ -133,6 +140,11 @@ void ATCommands::ATSPx(String cmd) {
 // set protocol
 void ATCommands::ATDPN() {
     connection->writeTo(ELM_PROTOCOL);
+    connection->writeEndOK();
+}
+
+void ATCommands::ATDP() {
+    connection->writeTo(ELM_PROTOCOL_DESC);
     connection->writeEndOK();
 }
 

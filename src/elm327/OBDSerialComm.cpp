@@ -65,38 +65,68 @@ void OBDSerialComm::setToDefaults() {
     setMemory(false);
 }
 
-void OBDSerialComm::writeTo(uint8_t cChar) {
+void OBDSerialComm::writeTo(uint8_t byte) {
+	//DEBUGW(byte);
+    serial->write(byte);
+}
+
+void OBDSerialComm::writeTo(char cChar) {
+	//DEBUGW(cChar);
     serial->write(cChar);
 }
 
 void OBDSerialComm::writeTo(char const *response) {
+	//DEBUGW(response);
     serial->write(response);
 }
 
 void OBDSerialComm::writeTo(String response) {
-    for (uint8_t i = 0; i < response.length(); i++) {
+    //DEBUGW(response.c_str());
+    serial->write(response.c_str());
+    /*for (uint8_t i = 0; i < response.length(); i++) {
+        //DEBUGW(response[i]);
         // Push each char 1 by 1 on each loop pass
         serial->write(response[i]);
-    }
+    }*/
 }
 
-void OBDSerialComm::writeEndPidTo(char const *response) {
-    if (whiteSpacesEnabled) {
-        uint8_t len = strlen(response);
-        char spacedResponse[len + len / 2 + 1];
-        addSpacesToResponse(response, spacedResponse);
-        writeTo(spacedResponse);
+void OBDSerialComm::writeEndPidTo(uint8_t const *response, uint8_t dataLen) {
+    uint8_t respLen;
+    char *resp;
+    if(this->headersEnabled)
+    {
+        //uint8_t len = strlen(response);
+        respLen = 4  + dataLen + 1;
+        uint8_t data[respLen];
+        data[0] = 0x80;                
+        data[1] = this->MyAddr;
+        data[2] = this->ECUaddr;      
+        data[3] = dataLen;
+        memcpy(data + 4, response, dataLen);
+        memcpy(data + 4 + dataLen, calcChecksum(data, 4 + dataLen), sizeof(uint8_t));
+        resp = toHexString(data, respLen);
     } else {
-        writeTo(response);
+        respLen = dataLen;
+        resp = toHexString(response, dataLen);
     }
+
+    if (whiteSpacesEnabled) {
+        char spacedResponse[respLen + respLen / 2 + 1];
+        addSpacesToResponse(resp, spacedResponse);
+        writeTo(resp);
+    } else {
+        writeTo(resp);
+    }
+    free(resp);
     writeEnd();
 }
 
 String OBDSerialComm::readData() {
     serial->flush(); // temp remove this
     String rxData = serial->readStringUntil(SERIAL_END_CHAR);
+	DEBUG("RX < " + rxData);
     if (isEchoEnable()) {
-        writeTo(rxData.c_str());
+        writeTo(rxData);
     }
     return rxData;
 }
@@ -148,4 +178,29 @@ void OBDSerialComm::addSpacesToResponse(const char *response, char spacedRes[]) 
         }
     }
     *(spacedRes + j) = '\0';
+}
+
+// Checksum is simply the sum of all data bytes modulo 0xFF
+// (same as being truncated to one byte)
+uint8_t OBDSerialComm::calcChecksum(uint8_t *data, uint8_t len)
+{
+  uint8_t crc = 0;
+
+  for (uint8_t i = 0; i < len; i++)
+  {
+    crc = crc + data[i];
+  }
+  return crc;
+}
+
+char * OBDSerialComm::toHexString(uint8_t *buffer, uint8_t len)
+{
+    char * asta = (char*)calloc(2 * len * sizeof(uint8_t) + 1, sizeof(char));
+    //char asta[2 * len * sizeof(uint8_t) + 1];
+    for (int k = 0; k < len; k++)
+    {
+        sprintf(&asta[2 * k],"%02X", buffer[k]);
+    }
+    asta[2 * len * sizeof(uint8_t)] = '\0';
+    return asta;
 }
